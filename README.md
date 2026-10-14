@@ -147,7 +147,7 @@ Fornecer uma solução centralizada que permita:
 
 ## 🏗️ Diagrama de Componentes
 
-![Diagrama de Componentes](docs/diagrama-componentes.png)
+![Diagrama de Componentes](docs/diagrama_componentes_mvc.jpg)
 
 ## 🚀 Status do Projeto
 
