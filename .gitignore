@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Arquivos gerados pelo Java/VS Code
+/bin/
+
+# Arquivos gerados pelo Maven
+/target/
