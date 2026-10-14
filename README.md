@@ -2,7 +2,7 @@
 
 Sistema para estimular o reconhecimento do mérito estudantil por meio de uma moeda virtual: professores distribuem moedas aos alunos como reconhecimento, e os alunos trocam essas moedas por produtos e descontos oferecidos por empresas parceiras.
 
-> 📚 Projeto desenvolvido para a disciplina **Laboratório de Projeto de Software** — PUC Minas, 2º semestre/2026
+> 📚 Projeto desenvolvido para a disciplina **Laboratório de Projeto de Software** — PUC Minas, Laboratório 3, 2º semestre/2026
 >
 > 👩‍🏫 Profa. Milena Menezes Adão
 
@@ -28,7 +28,7 @@ Sistema para estimular o reconhecimento do mérito estudantil por meio de uma mo
 
 O **Sistema de Moeda Estudantil** é uma plataforma de reconhecimento de mérito acadêmico baseada em uma moeda virtual. A cada semestre, professores vinculados às instituições parceiras recebem um montante de moedas que podem distribuir aos seus alunos por bom comportamento, participação em aula e outros motivos. Os alunos acumulam essas moedas e as trocam por vantagens cadastradas por empresas parceiras, como descontos em restaurantes da universidade, desconto de mensalidade ou compra de materiais específicos.
 
-O sistema conecta três perfis de usuário: aluno, professor e empresa parceira. Possui integração a um serviço de envio de emails, responsável por notificar o recebimento de moedas e por entregar os cupons de resgate.
+O sistema conecta três perfis de usuário: aluno, professor e empresa parceira. Também se integra a um serviço de envio de emails, responsável por notificar o recebimento de moedas e por entregar os cupons de resgate.
 
 ## 🎯 Objetivo
 
@@ -62,40 +62,36 @@ Fornecer uma solução centralizada que permita:
 |---|---|---|
 | **UC01** — Autenticar no sistema | Aluno, Professor, Empresa Parceira | Acessa o sistema por meio de login e senha |
 
-> ℹ️ Todos os casos de uso a seguir incluem o **UC01 — Autenticar no sistema** (relacionamento `«include»`), com exceção dos cadastros iniciais (**UC02** e **UC07**), que precedem a existência da conta.
-
 ### 🎒 Aluno
 
 | Caso de uso | Descrição |
 |---|---|
 | **UC02** — Cadastrar-se como aluno | Informa nome, email, CPF, RG, endereço, login e senha, e seleciona a instituição de ensino e o curso |
-| **UC03** — Consultar extrato da conta | Visualiza o saldo atual de moedas e o histórico de recebimentos e trocas |
+| **UC03** — Consultar extrato da conta | Visualiza o saldo atual de moedas e o histórico de recebimentos e trocas *(compartilhado com o Professor)* |
 | **UC04** — Consultar vantagens disponíveis | Lista as vantagens cadastradas pelas empresas parceiras, com descrição, foto e custo |
-| **UC05** — Resgatar vantagem | Seleciona uma vantagem, tem o custo debitado do saldo e recebe o cupom por email |
-| **UC06** — Receber notificação de moedas | É notificado por email sempre que um professor lhe envia moedas |
+| **UC05** — Resgatar vantagem | Seleciona uma vantagem e tem o custo debitado do saldo; inclui **UC10** (gera o código) e **UC11** (envia o cupom ao aluno e o comprovante ao parceiro) |
 
 ### 👩‍🏫 Professor
 
 | Caso de uso | Descrição |
 |---|---|
-| **UC07** — Enviar moedas a um aluno | Seleciona o aluno, informa o montante e o motivo do reconhecimento |
-| **UC08** — Consultar extrato da conta | Visualiza o saldo atual de moedas e o histórico de envios realizados |
+| **UC03** — Consultar extrato da conta | Visualiza o saldo atual de moedas e o histórico de envios realizados |
+| **UC06** — Enviar moedas a um aluno | Seleciona o aluno, informa o montante e o motivo do reconhecimento; inclui **UC11** (notifica o aluno por email) |
 
 ### 🏢 Empresa Parceira
 
 | Caso de uso | Descrição |
 |---|---|
-| **UC09** — Cadastrar-se como empresa parceira | Informa os dados da empresa, login e senha |
-| **UC10** — Manter vantagens | Cadastra, altera e remove vantagens, informando descrição, foto e custo em moedas |
-| **UC11** — Receber comprovante de resgate | Recebe por email o código do cupom resgatado, para conferência da troca presencial |
+| **UC07** — Cadastrar-se como empresa parceira | Informa os dados da empresa, login e senha |
+| **UC08** — Manter vantagens | Cadastra, altera e remove vantagens, informando descrição, foto e custo em moedas |
 
 ### ⚙️ Casos de uso do sistema
 
-| Caso de uso | Descrição |
-|---|---|
-| **UC12** — Creditar moedas semestrais aos professores | A cada semestre, adiciona 1.000 moedas ao saldo corrente de cada professor |
-| **UC13** — Gerar código de cupom | Gera o código que identifica o resgate e é enviado ao aluno e ao parceiro |
-| **UC14** — Enviar email | Aciona o serviço externo de email para notificações e cupons |
+| Caso de uso | Ator | Descrição |
+|---|---|---|
+| **UC09** — Creditar moedas semestrais aos professores | Tempo | A cada semestre, adiciona 1.000 moedas ao saldo corrente de cada professor |
+| **UC10** — Gerar código de cupom | — | Gera o código que identifica o resgate e é enviado ao aluno e ao parceiro |
+| **UC11** — Enviar email | Serviço de Email | Aciona o serviço externo para notificar o aluno sobre moedas recebidas e para entregar cupom (aluno) e comprovante (parceiro) com o código gerado |
 
 ## 📝 Histórias de Usuário
 
@@ -157,7 +153,7 @@ Fornecer uma solução centralizada que permita:
 
 ## 🚀 Status do Projeto
 
-- [ ] Lab03S01 — Diagrama de Casos de Uso + Histórias de Usuário + Diagrama de Classes + Diagrama de Componentes
+- [x] Lab03S01 — Diagrama de Casos de Uso + Histórias de Usuário + Diagrama de Classes + Diagrama de Componentes
 - [ ] Lab03S02 — Modelo ER, estratégia de acesso ao banco de dados e CRUDs de aluno e empresa parceira (versão inicial)
 - [ ] Lab03S03 — CRUDs de aluno e empresa parceira (versão final) + apresentação da arquitetura e da camada de persistência
 
