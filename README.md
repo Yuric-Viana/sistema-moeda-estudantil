@@ -143,7 +143,9 @@ Fornecer uma solução centralizada que permita:
 
 ## 🧩 Diagrama de Classes
 
-![Diagrama de Classes](docs/diagrama-classes.png)
+![Diagrama de Classes](docs/sistema_moeda_estudantil_01.jpg)
+![Diagrama de Classes](docs/sistema_moeda_estudantil_02.jpg)
+![Diagrama de Classes](docs/sistema_moeda_estudantil_03.jpg)
 
 ## 🏗️ Diagrama de Componentes
 
