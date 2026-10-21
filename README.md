@@ -18,6 +18,7 @@ Sistema para estimular o reconhecimento do mérito estudantil por meio de uma mo
 - [⚙️ Regras de Negócio](#️-regras-de-negócio)
 - [🗺️ Diagrama de Caso de Uso](#️-diagrama-de-caso-de-uso)
 - [🧩 Diagrama de Classes](#-diagrama-de-classes)
+- [🗄️ Modelo Entidade-Relacionamento (ER)](#️-modelo-entidade-relacionamento-er)
 - [🏗️ Diagrama de Componentes](#️-diagrama-de-componentes)
 - [🚀 Status do Projeto](#-status-do-projeto)
 - [✍️ Autores](#️-autores)
@@ -147,6 +148,18 @@ Fornecer uma solução centralizada que permita:
 ![Diagrama de Classes](docs/sistema_moeda_estudantil_02.jpg)
 ![Diagrama de Classes](docs/sistema_moeda_estudantil_03.jpg)
 
+## 🗄️ Modelo Entidade-Relacionamento (ER)
+
+O Modelo Entidade-Relacionamento (ER) representa a estrutura
+do banco de dados do Sistema de Moeda Estudantil, desenvolvido
+a partir do diagrama de classes.
+
+O modelo apresenta as entidades, seus atributos, chaves
+primárias (PK), chaves estrangeiras (FK) e cardinalidades
+dos relacionamentos.
+
+![Modelo Entidade-Relacionamento (ER)](docs/modelo_ER.drawio.png)
+
 ## 🏗️ Diagrama de Componentes
 
 ![Diagrama de Componentes](docs/diagrama_componentes_mvc.jpg)
@@ -154,7 +167,7 @@ Fornecer uma solução centralizada que permita:
 ## 🚀 Status do Projeto
 
 - [x] Lab03S01 — Diagrama de Casos de Uso + Histórias de Usuário + Diagrama de Classes + Diagrama de Componentes
-- [ ] Lab03S02 — Modelo ER, estratégia de acesso ao banco de dados e CRUDs de aluno e empresa parceira (versão inicial)
+- [ ] Lab03S02 — Modelo ER (concluído), estratégia de acesso ao banco de dados e CRUDs de aluno e empresa parceira (em desenvolvimento)
 - [ ] Lab03S03 — CRUDs de aluno e empresa parceira (versão final) + apresentação da arquitetura e da camada de persistência
 
 ## ✍️ Autores
