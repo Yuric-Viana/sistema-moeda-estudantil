@@ -164,10 +164,122 @@ dos relacionamentos.
 
 ![Diagrama de Componentes](docs/diagrama_componentes_mvc.jpg)
 
+## 🛠️ Tecnologias
+
+| Camada | Tecnologia |
+|---|---|
+| **Back-end** | Java 17, Spring Boot 4.1, Spring Web MVC, Spring Data JPA (Hibernate) |
+| **Banco de dados** | MySQL 9 |
+| **Segurança** | BCrypt (`spring-security-crypto`) para o hash das senhas |
+| **Front-end** | Next.js, React, TypeScript e Tailwind CSS |
+| **Build** | Maven (wrapper `mvnw` incluso no projeto) |
+
+## 🏛️ Arquitetura e Acesso a Dados
+
+O back-end segue a arquitetura em camadas (MVC), exposta como uma **API REST** consumida pelo front-end:
+
+```
+Front-end (Next.js)  ──HTTP/JSON──▶  Controller  ──▶  Service  ──▶  Repository  ──▶  MySQL
+                                        │              │               │
+                                       DTOs      regras de negócio   JPA / Hibernate
+```
+
+| Camada | Pacote | Responsabilidade |
+|---|---|---|
+| **Controller** | `controller` | Recebe as requisições HTTP e devolve as respostas |
+| **Service** | `service` | Concentra as regras de negócio e as transações |
+| **Repository** | `repository` | Acesso ao banco via Spring Data JPA |
+| **Model** | `model` | Entidades JPA mapeadas para as tabelas |
+| **DTO** | `dto` | Objetos de entrada e saída da API (a senha nunca é devolvida) |
+| **Exception** | `exception` | Exceções de negócio e tratamento centralizado de erros |
+| **Config** | `config` | Configurações (codificador de senhas, CORS) |
+
+**Estratégia de acesso ao banco: ORM.** O mapeamento objeto-relacional é feito com **JPA/Hibernate**:
+
+- As entidades são classes Java anotadas, e o Hibernate gera e executa o SQL.
+- `Usuario` é uma classe abstrata com herança do tipo `JOINED`: cada perfil (como `EmpresaParceira`) tem a sua própria tabela, ligada à tabela `usuario` pela chave primária compartilhada. Isso evita colunas vazias e permite reutilizar login e senha entre os perfis.
+- Os identificadores são `UUID`.
+- As senhas são armazenadas apenas como hash **BCrypt**.
+- Nesta fase, o esquema é atualizado automaticamente pelo Hibernate (`ddl-auto=update`). Quando o modelo ER estiver fechado, a ideia é migrar para `validate` com um script SQL versionado.
+## 📁 Estrutura do Repositório
+
+```
+sistema-moeda-estudantil/
+├── backend/                          API em Spring Boot
+│   └── src/main/java/br/com/sistemamoedaestudantil/sistema_moeda_estudantil/
+│       ├── config/
+│       ├── controller/
+│       ├── dto/
+│       ├── exception/
+│       ├── model/
+│       ├── repository/
+│       └── service/
+├── frontend/                         Interface em Next.js
+│   └── app/empresas/page.tsx         Tela de empresas parceiras
+├── docs/                             Diagramas e imagens
+└── README.md
+```
+
+## ▶️ Como Executar
+
+**Pré-requisitos:** Java 17 ou superior, Node.js 20 ou superior e MySQL em execução em `localhost:3306`.
+
+**1. Banco de dados**
+
+O banco `moeda_estudantil` é criado automaticamente na primeira execução. Por padrão a aplicação usa o usuário `root` sem senha; para usar outras credenciais, defina as variáveis de ambiente:
+
+```bash
+export DB_USER=seu_usuario
+export DB_PASSWORD=sua_senha
+```
+
+**2. Back-end** (porta 8080)
+
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+**3. Front-end** (porta 3000)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Com os dois em execução, acesse `http://localhost:3000/empresas`.
+
+## 🔌 API — Empresa Parceira
+
+Base: `/api/empresas-parceiras`
+
+| Método | Rota | Descrição | Respostas |
+|---|---|---|---|
+| `POST` | `/` | Cadastra uma empresa parceira | `201`, `409` |
+| `GET` | `/` | Lista as empresas cadastradas | `200` |
+| `GET` | `/{id}` | Busca uma empresa pelo id | `200`, `404` |
+| `PUT` | `/{id}` | Atualiza razão social, email e CNPJ | `200`, `404`, `409` |
+| `DELETE` | `/{id}` | Remove a empresa | `204`, `404` |
+
+Exemplo de cadastro:
+
+```json
+{
+  "razaoSocial": "Restaurante Exemplo LTDA",
+  "email": "contato@exemplo.com",
+  "cnpj": "12.345.678/0001-90",
+  "login": "restaurante",
+  "senha": "senha123"
+}
+```
+
+Login, CNPJ e email são únicos: duplicidades retornam `409` com `{"erro": "..."}`. A resposta nunca inclui a senha.
+
 ## 🚀 Status do Projeto
 
 - [x] Lab03S01 — Diagrama de Casos de Uso + Histórias de Usuário + Diagrama de Classes + Diagrama de Componentes
-- [ ] Lab03S02 — Modelo ER (concluído), estratégia de acesso ao banco de dados e CRUDs de aluno e empresa parceira (em desenvolvimento)
+- [x] Lab03S02 — Modelo ER (concluído), estratégia de acesso ao banco de dados e CRUDs de aluno e empresa parceira (em desenvolvimento)
 - [ ] Lab03S03 — CRUDs de aluno e empresa parceira (versão final) + apresentação da arquitetura e da camada de persistência
 
 ## ✍️ Autores
