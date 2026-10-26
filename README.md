@@ -20,6 +20,9 @@ Sistema para estimular o reconhecimento do mérito estudantil por meio de uma mo
 - [🧩 Diagrama de Classes](#-diagrama-de-classes)
 - [🗄️ Modelo Entidade-Relacionamento (ER)](#️-modelo-entidade-relacionamento-er)
 - [🏗️ Diagrama de Componentes](#️-diagrama-de-componentes)
+- [🎓 API — Alunos](#-api--alunos)
+- [🧪 Testes da Lab03S03](#-testes-da-lab03s03)
+- [📊 Apresentação da Lab03S03](#-apresentação-da-lab03s03)
 - [🚀 Status do Projeto](#-status-do-projeto)
 - [✍️ Autores](#️-autores)
 
@@ -205,18 +208,27 @@ Front-end (Next.js)  ──HTTP/JSON──▶  Controller  ──▶  Service  �
 
 ```
 sistema-moeda-estudantil/
-├── backend/                          API em Spring Boot
-│   └── src/main/java/br/com/sistemamoedaestudantil/sistema_moeda_estudantil/
-│       ├── config/
-│       ├── controller/
-│       ├── dto/
-│       ├── exception/
-│       ├── model/
-│       ├── repository/
-│       └── service/
-├── frontend/                         Interface em Next.js
-│   └── app/empresas/page.tsx         Tela de empresas parceiras
-├── docs/                             Diagramas e imagens
+├── backend/
+│   └── src/main/java/br/com/sistemamoedaestudantil/
+│       └── sistema_moeda_estudantil/
+│           ├── config/
+│           ├── controller/
+│           ├── dto/
+│           ├── exception/
+│           ├── model/
+│           ├── repository/
+│           └── service/
+├── frontend/
+│   └── app/
+│       ├── alunos/page.tsx
+│       └── empresas/page.tsx
+├── database/
+│   └── 03_alunos_instituicoes_cursos.sql
+├── docs/
+│   ├── modelo_ER.drawio.png
+│   └── Lab03S03_Pessoa1/
+├── tests/
+│   └── teste-api-alunos.ps1
 └── README.md
 ```
 
@@ -250,6 +262,49 @@ npm run dev
 
 Com os dois em execução, acesse `http://localhost:3000/empresas`.
 
+### Executando no Windows (PowerShell)
+
+**1. Iniciar o MySQL**
+
+Verifique se o serviço está funcionando:
+
+```powershell
+Get-Service MySQL84
+```
+
+Se estiver parado, inicie-o pelo PowerShell como administrador:
+
+```powershell
+Start-Service MySQL84
+```
+
+Caso o serviço não esteja configurado corretamente, será necessário corrigir sua configuração antes de utilizá-lo.
+
+**2. Iniciar o back-end**
+
+```powershell
+cd backend
+$env:DB_USER="root"
+$env:DB_PASSWORD="SUA_SENHA_MYSQL"
+.\mvnw.cmd spring-boot:run
+```
+
+**3. Iniciar o front-end**
+
+Em outro terminal, a partir da raiz do repositório:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+**4. Acessar as interfaces**
+
+- Alunos: http://localhost:3000/alunos
+- Empresas Parceiras: http://localhost:3000/empresas
+
+
 ## 🔌 API — Empresa Parceira
 
 Base: `/api/empresas-parceiras`
@@ -275,6 +330,110 @@ Exemplo de cadastro:
 ```
 
 Login, CNPJ e email são únicos: duplicidades retornam `409` com `{"erro": "..."}`. A resposta nunca inclui a senha.
+
+## 🎓 API — Alunos
+
+O módulo de Alunos permite cadastrar, listar, consultar, editar e excluir alunos, com persistência no MySQL utilizando Spring Data JPA e Hibernate.
+
+### Endpoints
+
+Base: `/api/alunos`
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `POST` | `/api/alunos` | Cadastra um aluno |
+| `GET` | `/api/alunos` | Lista os alunos cadastrados |
+| `GET` | `/api/alunos/{id}` | Consulta um aluno pelo ID |
+| `PUT` | `/api/alunos/{id}` | Atualiza os dados de um aluno |
+| `DELETE` | `/api/alunos/{id}` | Exclui um aluno |
+
+### Instituições e cursos
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `GET` | `/api/instituicoes` | Lista as instituições de ensino |
+| `GET` | `/api/instituicoes/{id}/cursos` | Lista os cursos de uma instituição |
+
+As instituições e os cursos são previamente cadastrados no banco de dados. Durante o cadastro, o aluno seleciona uma instituição e um dos cursos vinculados a ela.
+
+### Exemplo de cadastro
+
+```json
+{
+  "nome": "Aluno Exemplo",
+  "email": "aluno@example.com",
+  "cpf": "12345678909",
+  "rg": "MG12345678",
+  "endereco": "Rua Exemplo, 100",
+  "login": "alunoexemplo",
+  "senha": "senha123",
+  "instituicaoId": "UUID_DA_INSTITUICAO",
+  "cursoId": "UUID_DO_CURSO"
+}
+```
+
+### Regras de validação
+
+- Todos os dados obrigatórios devem ser preenchidos.
+- O CPF deve conter 11 dígitos.
+- A senha deve possuir no mínimo 6 caracteres no cadastro.
+- Login, e-mail e CPF não podem estar duplicados.
+- O curso selecionado deve pertencer à instituição informada.
+- As senhas são armazenadas utilizando hash BCrypt e não são retornadas nas respostas da API.
+
+### Persistência
+
+O módulo utiliza as entidades `Usuario`, `Aluno`, `InstituicaoEnsino` e `Curso`.
+
+A entidade `Aluno` herda os campos de autenticação de `Usuario`, utilizando a estratégia de herança `JOINED`. Cada aluno está vinculado a um curso, e cada curso pertence a uma instituição de ensino.
+
+## 🧪 Testes da Lab03S03
+
+Para verificar o funcionamento do módulo de Alunos, foi preparado um roteiro de testes das operações CRUD.
+
+Com o MySQL e o back-end em execução, o teste pode ser iniciado no PowerShell, a partir da raiz do repositório:
+
+```powershell
+.\tests\teste-api-alunos.ps1
+```
+
+O roteiro contempla cadastro, consulta, atualização e exclusão de aluno.
+
+Também podem ser executados os comandos:
+
+**Back-end:**
+
+```powershell
+cd backend
+.\mvnw.cmd clean test
+```
+
+**Front-end:**
+
+```powershell
+cd frontend
+npm run build
+```
+
+A realização desses testes deve ser confirmada antes da entrega final.
+
+## 📊 Apresentação da Lab03S03
+
+A Sprint Lab03S03 contempla a finalização dos CRUDs de Alunos e Empresas Parceiras, além da apresentação da arquitetura e da camada de persistência do sistema.
+
+A apresentação aborda:
+
+- Arquitetura em camadas e comunicação por API REST.
+- Organização em Controller, Service, Repository, Model e DTO.
+- Persistência com Spring Data JPA, Hibernate e MySQL.
+- Modelo Entidade-Relacionamento e cardinalidades.
+- Demonstração das operações CRUD.
+
+**Materiais da Pessoa 1:**
+
+- [Slides da apresentação](docs/Lab03S03_Pessoa1/apresentacao_yuri_Lab03S03.pptx)
+- [Roteiro de apresentação](docs/Lab03S03_Pessoa1/ROTEIRO_APRESENTACAO.md)
+- [Checklist da entrega](docs/Lab03S03_Pessoa1/CHECKLIST_ENTREGA.md)
 
 ## 🚀 Status do Projeto
 
