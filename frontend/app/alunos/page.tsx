@@ -223,6 +223,7 @@ export default function Home() {
               >
                 {titulo}
               </label>
+
               <input
                 className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 disabled:bg-slate-50"
                 id={campo}
@@ -234,8 +235,17 @@ export default function Home() {
                       : "text"
                 }
                 placeholder={placeholder}
+                maxLength={campo === "cpf" ? 11 : undefined}
+                minLength={
+                  campo === "cpf"
+                    ? 11
+                    : campo === "senha" && !editId
+                      ? 6
+                      : undefined
+                }
+                inputMode={campo === "cpf" ? "numeric" : undefined}
+                pattern={campo === "cpf" ? "[0-9]{11}" : undefined}
                 required={campo !== "senha" || !editId}
-                minLength={campo === "senha" && !editId ? 6 : undefined}
                 value={form[campo]}
                 onChange={(e) => mudar(campo, e.target.value)}
               />
