@@ -8,6 +8,8 @@ import br.com.sistemamoedaestudantil.sistema_moeda_estudantil.exception.RegraNeg
 import br.com.sistemamoedaestudantil.sistema_moeda_estudantil.model.EmpresaParceira;
 import br.com.sistemamoedaestudantil.sistema_moeda_estudantil.repository.EmpresaParceiraRepository;
 import br.com.sistemamoedaestudantil.sistema_moeda_estudantil.repository.UsuarioRepository;
+import br.com.sistemamoedaestudantil.sistema_moeda_estudantil.util.Cnpj;
+import br.com.sistemamoedaestudantil.sistema_moeda_estudantil.validator.EmpresaParceiraValidador;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,21 +34,27 @@ public class EmpresaParceiraService {
 
     @Transactional
     public EmpresaParceiraResponse cadastrar(EmpresaParceiraRequest request) {
-        if (usuarioRepository.existsByLogin(request.login())) {
+        EmpresaParceiraValidador.validarCadastro(request);
+
+        String login = request.login().trim();
+        String email = request.email().trim().toLowerCase();
+        String cnpj = Cnpj.formatar(request.cnpj());
+
+        if (usuarioRepository.existsByLogin(login)) {
             throw new RegraNegocioException("Login já cadastrado");
         }
-        if (empresaRepository.existsByCnpj(request.cnpj())) {
+        if (empresaRepository.existsByCnpj(cnpj)) {
             throw new RegraNegocioException("CNPJ já cadastrado");
         }
-        if (empresaRepository.existsByEmail(request.email())) {
+        if (empresaRepository.existsByEmail(email)) {
             throw new RegraNegocioException("Email já cadastrado");
         }
 
         EmpresaParceira empresa = new EmpresaParceira();
-        empresa.setRazaoSocial(request.razaoSocial());
-        empresa.setEmail(request.email());
-        empresa.setCnpj(request.cnpj());
-        empresa.setLogin(request.login());
+        empresa.setRazaoSocial(request.razaoSocial().trim());
+        empresa.setEmail(email);
+        empresa.setCnpj(cnpj);
+        empresa.setLogin(login);
         empresa.setSenhaHash(passwordEncoder.encode(request.senha()));
 
         return EmpresaParceiraResponse.de(empresaRepository.save(empresa));
@@ -66,18 +74,22 @@ public class EmpresaParceiraService {
 
     @Transactional
     public EmpresaParceiraResponse atualizar(UUID id, EmpresaParceiraAtualizacaoRequest request) {
-        EmpresaParceira empresa = buscarEntidade(id);
+        EmpresaParceiraValidador.validarAtualizacao(request);
 
-        if (!empresa.getCnpj().equals(request.cnpj()) && empresaRepository.existsByCnpj(request.cnpj())) {
+        EmpresaParceira empresa = buscarEntidade(id);
+        String email = request.email().trim().toLowerCase();
+        String cnpj = Cnpj.formatar(request.cnpj());
+
+        if (!empresa.getCnpj().equals(cnpj) && empresaRepository.existsByCnpj(cnpj)) {
             throw new RegraNegocioException("CNPJ já cadastrado");
         }
-        if (!empresa.getEmail().equals(request.email()) && empresaRepository.existsByEmail(request.email())) {
+        if (!empresa.getEmail().equals(email) && empresaRepository.existsByEmail(email)) {
             throw new RegraNegocioException("Email já cadastrado");
         }
 
-        empresa.setRazaoSocial(request.razaoSocial());
-        empresa.setEmail(request.email());
-        empresa.setCnpj(request.cnpj());
+        empresa.setRazaoSocial(request.razaoSocial().trim());
+        empresa.setEmail(email);
+        empresa.setCnpj(cnpj);
 
         return EmpresaParceiraResponse.de(empresaRepository.save(empresa));
     }
