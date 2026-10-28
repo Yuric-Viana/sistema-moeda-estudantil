@@ -47,6 +47,14 @@ const vazio: Form = {
 const estiloCampo =
     "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100 disabled:bg-slate-50 disabled:text-slate-400";
 
+function mascararCpf(valor: string): string {
+  const d = valor.replace(/\D/g, "").slice(0, 11);
+  return d
+      .replace(/^(\d{3})(\d)/, "$1.$2")
+      .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/\.(\d{3})(\d)/, ".$1-$2");
+}
+
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
@@ -139,7 +147,7 @@ export default function AlunosPage() {
     setForm({
       nome: a.nome,
       email: a.email,
-      cpf: a.cpf,
+      cpf: mascararCpf(a.cpf),
       rg: a.rg,
       endereco: a.endereco,
       login: a.login,
@@ -199,7 +207,7 @@ export default function AlunosPage() {
   }[] = [
     { nome: "nome", rotulo: "Nome completo", placeholder: "Nome do aluno", largura: "lg:col-span-2" },
     { nome: "email", rotulo: "E-mail", placeholder: "aluno@email.com", largura: "lg:col-span-2" },
-    { nome: "cpf", rotulo: "CPF (11 dígitos)", placeholder: "00000000000", largura: "" },
+    { nome: "cpf", rotulo: "CPF", placeholder: "000.000.000-00", largura: "" },
     { nome: "rg", rotulo: "RG", placeholder: "Número do RG", largura: "" },
     { nome: "endereco", rotulo: "Endereço", placeholder: "Rua, número, bairro e cidade", largura: "lg:col-span-2" },
     { nome: "login", rotulo: "Login", placeholder: "nome de usuário", largura: "" },
@@ -254,19 +262,20 @@ export default function AlunosPage() {
                                   : "text"
                         }
                         placeholder={campo.placeholder}
-                        maxLength={campo.nome === "cpf" ? 11 : campo.nome === "senha" ? 72 : undefined}
+                        maxLength={campo.nome === "cpf" ? 14 : campo.nome === "senha" ? 72 : undefined}
                         minLength={
                           campo.nome === "cpf"
-                              ? 11
+                              ? 14
                               : campo.nome === "senha" && !editId
                                   ? 6
                                   : undefined
                         }
                         inputMode={campo.nome === "cpf" ? "numeric" : undefined}
-                        pattern={campo.nome === "cpf" ? "[0-9]{11}" : undefined}
                         required={campo.nome !== "senha" || !editId}
                         value={form[campo.nome]}
-                        onChange={(e) => mudar(campo.nome, e.target.value)}
+                        onChange={(e) =>
+                            mudar(campo.nome, campo.nome === "cpf" ? mascararCpf(e.target.value) : e.target.value)
+                        }
                     />
                   </div>
               ))}
@@ -393,7 +402,7 @@ export default function AlunosPage() {
                           </p>
                           <div className="mt-1.5 flex flex-wrap gap-2 text-xs">
                       <span className="rounded-md bg-slate-100 px-2 py-0.5 text-slate-600">
-                        CPF {a.cpf}
+                        CPF {mascararCpf(a.cpf)}
                       </span>
                             <span className="rounded-md bg-slate-100 px-2 py-0.5 text-slate-600">
                         @{a.login}

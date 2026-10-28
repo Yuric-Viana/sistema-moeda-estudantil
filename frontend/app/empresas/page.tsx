@@ -49,6 +49,15 @@ async function mensagemDeErro(resposta: Response): Promise<string> {
     return dados.erro ?? `Erro ao salvar (HTTP ${resposta.status}).`;
 }
 
+function mascararCnpj(valor: string): string {
+    const d = valor.replace(/\D/g, "").slice(0, 14);
+    return d
+        .replace(/^(\d{2})(\d)/, "$1.$2")
+        .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+        .replace(/\.(\d{3})(\d)/, ".$1/$2")
+        .replace(/(\d{4})(\d)/, "$1-$2");
+}
+
 const SEM_CONEXAO = "Não foi possível conectar ao servidor. Verifique se o back-end está iniciado.";
 
 export default function EmpresasPage() {
@@ -200,10 +209,21 @@ export default function EmpresasPage() {
                                         className={estiloCampo}
                                         type={campo.tipo}
                                         placeholder={campo.placeholder}
-                                        minLength={campo.tipo === "password" ? 6 : undefined}
-                                        maxLength={campo.tipo === "password" ? 72 : undefined}
+                                        maxLength={
+                                            campo.tipo === "password" ? 72 : campo.nome === "cnpj" ? 18 : undefined
+                                        }
+                                        minLength={
+                                            campo.tipo === "password" ? 6 : campo.nome === "cnpj" ? 18 : undefined
+                                        }
+                                        inputMode={campo.nome === "cnpj" ? "numeric" : undefined}
                                         value={form[campo.nome]}
-                                        onChange={(e) => setForm({ ...form, [campo.nome]: e.target.value })}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                [campo.nome]:
+                                                    campo.nome === "cnpj" ? mascararCnpj(e.target.value) : e.target.value,
+                                            })
+                                        }
                                         required
                                     />
                                 </div>
