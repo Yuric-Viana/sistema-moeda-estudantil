@@ -5,7 +5,18 @@
 }
 
 body {
-  background: #f3f7fd;
-  color: #1b2233;
+  background: #f8f7fc;
+  color: #1b1b2f;
   font-family: var(--font-geist-sans, system-ui), system-ui, sans-serif;
+}
+
+
+button:not(:disabled),
+select:not(:disabled),
+summary {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
